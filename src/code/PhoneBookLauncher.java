@@ -72,9 +72,10 @@ public class PhoneBookLauncher {
 		
 		if (loginResult) {
 //			로그인 성공! 성공처리 메쏘드 별개로 작성
-			
+			System.out.println("로그인에 성공했습니다!");
 		}
 		else {
+			System.out.println("아이디나 비번이 잘못되었습니다.");
 			System.out.println("메인화면으로 이동합니다.");
 		}
 	}
@@ -102,7 +103,29 @@ public class PhoneBookLauncher {
 //			저장된 접속정보로 디비 접속
 			conn = DriverManager.getConnection(url, "delivery","dbpassword");
 			
-			System.out.println("DB연결 성공!");
+//			System.out.println("DB연결 성공!");
+			
+//			재료로 받은 아이디,비번이 모두 맞는 사용자가 있는지 쿼리
+			String loginQuery = String.format("SELECT * FROM users WHERE email = '%s' AND password = '%s';", email,pw);
+			
+//			쿼리를 수행해서 결과를 저장
+//			1. stmt 변수를 객체화
+			stmt = conn.createStatement();
+//			2.stmt이용해서 로그인 쿼리 실행 + 결과를 rs에 저장
+			rs = stmt.executeQuery(loginQuery);
+//			3.rs에 저장된 표를 조회
+//			rs.next는, 다음 읽을 줄이 있다면 그 줄로 커서를 이동시키고 true 리턴
+//			읽을 내용이 더 없다면 false리턴
+			while(rs.next()) {
+//				이안에 들어왔다 = 아이디,비번이 맞는 사람이 있다
+//				=>로그인에 성공했다!
+				
+				result = true;
+				
+				
+			}
+			
+			
 			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
