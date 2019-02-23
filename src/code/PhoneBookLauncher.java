@@ -98,11 +98,11 @@ public class PhoneBookLauncher {
 			
 //			불러온 JDBC를 이용해서 DB에 접속
 //			접속 정보를 변수에 저장.
-			String url = " jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
 			
 //			저장된 접속정보와 아이디 비번을 가지고 실제로 DB에 접속.
 			conn = DriverManager.getConnection(url, "delivery", "dbpassword");
-			System.out.println("DB 연결 성공!");
+//			System.out.println("DB 연결 성공!");
 			
 //			재료로 받은 아이디/비번이 모두 맞는 사용자가 있는지 쿼리.
 			String loginQuery = String.format("SELECT * FROM users "
