@@ -3,6 +3,7 @@ package code.datas;
 public class User {
 	
 //	로그인한 사용자의 이름, 이메일을 저장
+	private int id;
 	private String email;
 	private String name;
 	

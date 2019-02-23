@@ -47,11 +47,11 @@ public class PhoneBookLauncher {
 	
 //	메인화면을 출력하는 메쏘드
 	public void printMainMenu() {
-		System.out.println("********* 전화번호부 **********");
+		System.out.println("********* 메인화면 **********");
 		System.out.println(" 1. 로그인");
 		System.out.println(" 2. 회원가입");
 		System.out.println(" 0. 프로그램 종료");
-		System.out.println("***************************");
+		System.out.println("**************************");
 		System.out.print("원하는 동작을 입력 : ");
 		
 	}
@@ -77,6 +77,9 @@ public class PhoneBookLauncher {
 //			로그인 성공! 성공 처리 메쏘드 별개로 작성.
 			System.out.println("로그인에 성공했습니다!");
 			System.out.println(String.format("%s님 환영합니다!", GlobalData.LoginUser.getName()));
+			
+			loginMenu();
+			
 		}
 		else {
 			System.out.println("아이디나 비번이 잘못되었습니다.");
@@ -136,6 +139,9 @@ public class PhoneBookLauncher {
 				tempUser.setName(rs.getString(rs.findColumn("name")));
 				tempUser.setEmail(rs.getString(rs.findColumn("email")));
 				
+//				누락되었던 사용자 고유번호 (id)도 세팅
+				tempUser.setId(rs.getInt(rs.findColumn("id")));
+				
 //				로그인한 사람을 저장! (더이상 null이 아니게 되겠지)
 				GlobalData.LoginUser = tempUser;
 			}
@@ -167,7 +173,7 @@ public class PhoneBookLauncher {
 		System.out.print("이름 입력 : ");
 		String signupName = scan3.nextLine();
 		
-		registerUserToDB(signupEmail, signupName, signupPassword);
+		registerUserToDB(signupEmail, signupPassword, signupName);
 		
 	}
 	
@@ -209,6 +215,116 @@ public class PhoneBookLauncher {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void loginMenu() {
+		
+		Scanner scan = new Scanner(System.in);
+		
+		while (true) {
+			printUserMenu();
+			int menuNum = scan.nextInt();
+			
+			if (menuNum == 1) {
+				
+			}
+			else if (menuNum == 2) {
+				addPhoneNumbers();
+				
+			}
+			else if (menuNum == 3) {
+				
+			}
+			else if (menuNum == 0) {
+//				로그아웃=>로그인한 사람이 없다고 설정.
+				GlobalData.LoginUser = null;
+				System.out.println("로그아웃했습니다.");
+				System.out.println("메인화면으로 돌아갑니다.");
+				break;
+				
+			}
+			else {
+				System.out.println("잘못된 입력입니다.");
+			}
+						
+		}
+		
+	}
+	
+	
+	public void printUserMenu() {
+		System.out.println("********* 전화번호부 **********");
+		System.out.println(" 1. 전체 전화번호 목록 조회");
+		System.out.println(" 2. 전화번호 등록");
+		System.out.println(" 3. 전화번호 삭제");
+		System.out.println(" 0. 로그아웃");
+		System.out.println("***************************");
+		System.out.print("메뉴를 선택하세요 : ");
+	}
+	
+	public void showAllPhoneNumbers() {
+//		
+		
+	}
+	
+//	전화번호 등록을 누르면 들어오는 메쏘드
+	public void addPhoneNumbers() {
+		System.out.println("새 전화번호를 등록합니다.");
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.print("이름 : ");
+		String inputName = scan.next();
+		
+		System.out.print("폰번 : ");
+		String inputPhoneNum = scan.next();
+		
+		System.out.print("특이사항 : ");
+		String inputMemo = scan.next();
+		
+//		여기까지 사용자에게 정보를 입력 받는 부분
+//		입력을 다 받았으니 DB에 기록
+		
+		registerPhoneNumToDB (inputName, inputPhoneNum, inputMemo);
+		
+	}
+	
+	public void registerPhoneNumToDB(String inputName, String inputPhone, String inputMemo) {
+		
+	}
+	
+	Connection conn = null;
+//	INSERT 등의 데이터 조작 쿼리를 실행시켜주는 변수
+	PreparedStatement pstmt = null;
+	
+	try {
+		Class.forName("com.mysql.jdbc.Driver");
+		
+		String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+		conn = DriverManager.getConnection(url, "delivery", "dbpassword");	
+
+//		INSERT 쿼리를 먼저 작성!
+		String signUpSql = String.format("INSERT INTO phone_numbers (name, phone_num, memo, user_id)"
+				+ " VALUES ('%s', '%s', '%s', %d);", inputName, inputPhone, inputMemo, GlobalData.LoginUser.get);
+//		DB 연결이 되었으니, INSERT 쿼리를 날릴 준비.
+		pstmt = conn.prepareStatement(signUpSql);
+		
+//		INSERT/UPDAT/DELETE 문을 실행하면, 영향 받은 줄이 몇 줄인지?
+		int affectedRowCount = pstmt.executeUpdate();
+		
+		if (affectedRowCount == 0) {
+			System.out.println("회원가입에 문제가 발생했습니다!");
+		}
+		else {
+			System.out.println("회원가입에 성공했습니다!");
+			System.out.println("메인메뉴로 돌아갑니다.");
+		}
+		
+	} catch (ClassNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	}
 	
 
