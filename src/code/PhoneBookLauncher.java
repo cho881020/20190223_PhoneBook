@@ -79,7 +79,7 @@ public class PhoneBookLauncher {
 		if (loginResult) {
 //			로그인 성공! 성공 처리 메쏘드 별개로 작성.
 			System.out.println("로그인에 성공했습니다!");
-			System.out.println(String.format("%s님 환영합니다!", GlobalData.LoginUser.getName()));
+			System.out.println(String.format("%s님 환영합니다!", GlobalData.loginUser.getName()));
 			
 			loginMenu();
 			
@@ -146,7 +146,7 @@ public class PhoneBookLauncher {
 				tempUser.setId(rs.getInt(rs.findColumn("id")));
 				
 //				로그인한 사람을 저장! (더이상 null이 아니게 되겠지)
-				GlobalData.LoginUser = tempUser;
+				GlobalData.loginUser = tempUser;
 			}
 			
 		} catch (ClassNotFoundException e) {
@@ -229,6 +229,7 @@ public class PhoneBookLauncher {
 			int menuNum = scan.nextInt();
 			
 			if (menuNum == 1) {
+				showAllPhoneNumbers();
 				
 			}
 			else if (menuNum == 2) {
@@ -236,11 +237,12 @@ public class PhoneBookLauncher {
 				
 			}
 			else if (menuNum == 3) {
+				deletePhoneNum();
 				
 			}
 			else if (menuNum == 0) {
 //				로그아웃=>로그인한 사람이 없다고 설정.
-				GlobalData.LoginUser = null;
+				GlobalData.loginUser = null;
 				System.out.println("로그아웃했습니다.");
 				System.out.println("메인화면으로 돌아갑니다.");
 				break;
@@ -269,7 +271,16 @@ public class PhoneBookLauncher {
 	public void showAllPhoneNumbers() {
 //		동작 구조 : DB에서 먼저 목록을 조회.
 //		조회 결과를 ArrayList에 저장.
+		
+		GlobalData.loginUserPhoneNums = getPhoneNumsFromDB();
+		
 //		저장된 ArrayList를 화면에 출력	
+		for (int i=0 ; i < GlobalData.loginUserPhoneNums.size(); i++) {
+			PhoneNumber pn = GlobalData.loginUserPhoneNums.get(i);
+			System.out.println(String.format("%s/%s/%s", pn.getName(), pn.getPhoneNumber(), pn.getMemo()));
+			
+		}
+			
 	}
 	public List<PhoneNumber> getPhoneNumsFromDB() {
 //		찾아낸 폰번들을 임시로 저장할 ArrayList
@@ -295,16 +306,17 @@ public class PhoneBookLauncher {
 			conn = DriverManager.getConnection(url, "delivery", "dbpassword");
 //			System.out.println("DB 연결 성공!");
 			
-//			재료로 받은 아이디/비번이 모두 맞는 사용자가 있는지 쿼리.
-			String loginQuery = String.format("SELECT * FROM users "
-					+ "WHERE email = '%s' AND password = '%s';", email, pw);
+//			로그인한 사람이 등록한 폰번들을 조회
+//			Ex. 3번 사용자. 가 등록한 모든 폰번?
+			String phoneNumsQuery = String.format("SELECT * FROM phone_numbers "
+					+ "WHERE user_id = %d;", GlobalData.loginUser.getId());
 			
 //			쿼리를 수행해서 결과를 저장
 //			1. stmt 변수를 객체화
 			stmt = conn.createStatement();
 			
 //			2. stmt를 이용해서 loginQuery를 실행 + 결과를 rs에 저장
-			rs = stmt.executeQuery(loginQuery);
+			rs = stmt.executeQuery(phoneNumsQuery);
 			
 			
 			
@@ -378,7 +390,7 @@ public class PhoneBookLauncher {
 
 //			INSERT 쿼리를 먼저 작성!
 			String signUpSql = String.format("INSERT INTO phone_numbers (name, phone_num, memo, user_id)"
-					+ " VALUES ('%s', '%s', '%s', %d);", inputName, inputPhone, inputMemo, GlobalData.LoginUser.getId());
+					+ " VALUES ('%s', '%s', '%s', %d);", inputName, inputPhone, inputMemo, GlobalData.loginUser.getId());
 //			DB 연결이 되었으니, INSERT 쿼리를 날릴 준비.
 			pstmt = conn.prepareStatement(signUpSql);
 			
@@ -390,6 +402,59 @@ public class PhoneBookLauncher {
 			}
 			else {
 				System.out.println("전화번호 등록에 성공했습니다!");
+				System.out.println("사용자 메뉴로 돌아갑니다.");
+			}
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void deletePhoneNum() {
+//		사용자에게 삭제하고 자하는 사람의 이름을 입력받자.
+		System.out.println("전화번호 삭제!");
+		Scanner scan = new Scanner(System.in);
+		System.out.print("지울 사람 이름 입력 : ");
+		String deletePhoneNumName = scan.nextLine();
+		
+//		(로그인한 사용자가 등록한 폰번 중) 그이름과 같은 폰번을 삭제
+		
+		deletePhoneNumFromDB(deletePhoneNumName);
+//		삭제하면 사용자 메뉴로 복귀
+		System.out.println("삭제 메뉴를 종료합니다.");
+	}
+	
+	public void deletePhoneNumFromDB(String name) {
+		Connection conn = null;
+//		INSERT 등의 데이터 조작 쿼리를 실행시켜주는 변수
+		PreparedStatement pstmt = null;
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			conn = DriverManager.getConnection(url, "delivery", "dbpassword");	
+
+//			INSERT 쿼리를 먼저 작성!
+			String deleteSql = String.format("DELETE FROM phone_numbers"
+					+ " WHERE name='%s' AND user_id = %d;", name, GlobalData.loginUser.getId());
+//			DB 연결이 되었으니, INSERT 쿼리를 날릴 준비.
+			pstmt = conn.prepareStatement(deleteSql);
+			
+//			INSERT/UPDAT/DELETE 문을 실행하면, 영향 받은 줄이 몇 줄인지?
+			int affectedRowCount = pstmt.executeUpdate();
+			
+			if (affectedRowCount == 0) {
+				System.out.println("전화번호를 삭제하지 못햇습니다.");
+				System.out.println("입력한 이름을 확인해주세요.");
+			}
+			else {
+				System.out.println(String.format("%d개의 전화번호가 삭제되었습니다.", affectedRowCount));
 				System.out.println("사용자 메뉴로 돌아갑니다.");
 			}
 			
