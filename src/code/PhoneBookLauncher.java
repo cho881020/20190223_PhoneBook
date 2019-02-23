@@ -2,11 +2,13 @@ package code;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import code.datas.User;
 import code.utils.GlobalData;
 
 public class PhoneBookLauncher {
@@ -29,6 +31,8 @@ public class PhoneBookLauncher {
 			}
 			else if (userInput == 2) {
 //				회원가입
+				signUp();
+				
 			}
 			else if (userInput == 0) {
 //				프로그램 종료
@@ -47,7 +51,7 @@ public class PhoneBookLauncher {
 //	메인화면을 출력하는 메쏘드
 	public void printMainMenu() {
 		
-		System.out.println("********** 메인화면 **********");
+		System.out.println("********** 전화번호부 **********");
 		System.out.println(" 1. 로그인");
 		System.out.println(" 2. 회원가입");
 		System.out.println(" 0. 프로그램 종료");
@@ -80,9 +84,7 @@ public class PhoneBookLauncher {
 //			로그인 성공! 성공 처리 메쏘드 별개로 작성.
 			
 			System.out.println("로그인에 성공했습니다!");
-			System.out.println(String.format("'%s'님 환영합니다!", GlobalData.loginUser.getName()));
-			
-			loginMenu();
+			System.out.println(String.format("%s님 환영합니다!", GlobalData.loginUser.getName()));
 			
 		}
 		else {
@@ -139,7 +141,7 @@ public class PhoneBookLauncher {
 				
 //				로그인한 사람을 객체로 만들어서 GlobalData의 변수에 저장.
 				
-				User tempUser = new tempUser();
+				User tempUser = new User();
 				
 //				쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장.
 				tempUser.setName(rs.getString(rs.findColumn("name")));
@@ -166,47 +168,73 @@ public class PhoneBookLauncher {
 		return result;
 	}
 	
-	
-	public void loginMenu() {
+	public void signUp() {
+//		회원가입 관련 코드가 작성될 부분.
+//		사용자에게 이메일, 비번, 이름을 입력받아서 DB에 INSERT!
 		
-		Scanner scan = new Scanner(System.in);
+		System.out.println("회원가입을 진행합니다.");
 		
-		while (true) {
-			printUserMenu();
-			int menuNum = scan.nextInt();
-			
-			if(menuNum == 1) {
-				
-			}
-			else if (menuNum == 2) {
-				
-			}
-			else if (menuNum == 3) {
-				
-			}
-			else if (menuNum == 0) {
-				
-				GlobalData.loginUser = null;
-				
-				System.out.println("로그아웃했습니다.");
-				System.out.println("메인 화면으로 돌아갑니다.");
-				break;
-				
-			}
-			
-			
-		}
+		Scanner scan1 = new Scanner(System.in);
+		System.out.print("아이디 입력 : ");
+		String signUpEmail = scan1.nextLine();
+		
+		Scanner scan2 = new Scanner(System.in);
+		System.out.print("비밀번호 입력 : ");
+		String signUpPassword = scan2.nextLine();
+		
+		
+		Scanner scan3 = new Scanner(System.in);
+		System.out.print("이름 입력 : ");
+		String signUpName = scan3.nextLine();
+		
+		registerUserToDB(signUpEmail, signUpPassword, signUpName);
+		
+		
 		
 	}
 	
-	private void printUserMenu() {
-		System.out.println("********** 전화번호부 **********");
-		System.out.println("1. 전체 전화번호 목록 조회");
-		System.out.println("2. 전화번호 등록");
-		System.out.println("3. 전화번호 삭제");
-		System.out.println("0. 로그아웃");
-		System.out.println("****************************");
-		System.out.println("메뉴를 선택하세요 : ");
+	
+//	DB에 사용자를 등록!
+	public void registerUserToDB(String email, String pw, String name) {
+		
+		
+		Connection conn = null;
+//		INSERT 등의 데이터 조작 쿼리를 실행시켜주는 변수
+		PreparedStatement pstmt = null;
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			conn = DriverManager.getConnection(url, "delivery", "dbpassword");
+			
+//			INSERT 쿼리를 먼저 작성!
+			String signUpSql = String.format("INSERT INTO users (email, password, name) "
+					+ "VALUES  ('%s', '%s', '%s');", email, pw, name);
+			
+//			DB연결이 되었으니, INSERT 쿼리를 날릴 준비.
+			pstmt = conn.prepareStatement(signUpSql);
+			
+//			INSERT/UPDATE/DELETE 문을 실행하면, 영향 받은 줄이 몇줄인지?
+			int affectedRowCount =  pstmt.executeUpdate();
+			
+			if (affectedRowCount == 0) {
+				System.out.println("회원가입에 문제가 발생했습니다.");
+			}
+			else {
+				System.out.println("회원가입에 성공했습니다!");
+				System.out.println("메인메뉴로 돌아갑니다.");
+			}
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 	
