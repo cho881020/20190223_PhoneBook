@@ -340,6 +340,7 @@ public class PhoneBookLauncher {
 //			DB연결이 되었으니, INSERT 쿼리를 날릴 준비.						
 			pstmt = conn.prepareStatement(insertPhoneNumSql);
 			
+			
 //			INSERT/UPDATE/DELET 문을 실행하면, 영향 받은 줄이 몇줄인지?
 			int affectedRowCount = pstmt.executeUpdate();
 			
