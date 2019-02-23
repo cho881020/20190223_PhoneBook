@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-import code.datas.User;
 import code.utils.GlobalData;
 
 public class PhoneBookLauncher {
@@ -48,7 +47,7 @@ public class PhoneBookLauncher {
 //	메인화면을 출력하는 메쏘드
 	public void printMainMenu() {
 		
-		System.out.println("********** 전화번호부 **********");
+		System.out.println("********** 메인화면 **********");
 		System.out.println(" 1. 로그인");
 		System.out.println(" 2. 회원가입");
 		System.out.println(" 0. 프로그램 종료");
@@ -81,7 +80,9 @@ public class PhoneBookLauncher {
 //			로그인 성공! 성공 처리 메쏘드 별개로 작성.
 			
 			System.out.println("로그인에 성공했습니다!");
-			System.out.println(String.format("%s님 환영합니다!", GlobalData.loginUser.getName()));
+			System.out.println(String.format("'%s'님 환영합니다!", GlobalData.loginUser.getName()));
+			
+			loginMenu();
 			
 		}
 		else {
@@ -138,7 +139,7 @@ public class PhoneBookLauncher {
 				
 //				로그인한 사람을 객체로 만들어서 GlobalData의 변수에 저장.
 				
-				User tempUser = new User();
+				User tempUser = new tempUser();
 				
 //				쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장.
 				tempUser.setName(rs.getString(rs.findColumn("name")));
@@ -163,6 +164,50 @@ public class PhoneBookLauncher {
 		
 		
 		return result;
+	}
+	
+	
+	public void loginMenu() {
+		
+		Scanner scan = new Scanner(System.in);
+		
+		while (true) {
+			printUserMenu();
+			int menuNum = scan.nextInt();
+			
+			if(menuNum == 1) {
+				
+			}
+			else if (menuNum == 2) {
+				
+			}
+			else if (menuNum == 3) {
+				
+			}
+			else if (menuNum == 0) {
+				
+				GlobalData.loginUser = null;
+				
+				System.out.println("로그아웃했습니다.");
+				System.out.println("메인 화면으로 돌아갑니다.");
+				break;
+				
+			}
+			
+			
+		}
+		
+	}
+	
+	private void printUserMenu() {
+		System.out.println("********** 전화번호부 **********");
+		System.out.println("1. 전체 전화번호 목록 조회");
+		System.out.println("2. 전화번호 등록");
+		System.out.println("3. 전화번호 삭제");
+		System.out.println("0. 로그아웃");
+		System.out.println("****************************");
+		System.out.println("메뉴를 선택하세요 : ");
+		
 	}
 	
 }
