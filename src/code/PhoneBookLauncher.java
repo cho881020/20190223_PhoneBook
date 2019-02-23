@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-import jdk.nashorn.internal.objects.Global;
-
 public class PhoneBookLauncher {
 
 	public void startPhoneBook() {
@@ -80,7 +78,6 @@ public class PhoneBookLauncher {
 //			로그인 성공! 성공 처리 메쏘드 별개로 작성.
 			
 			System.out.println("로그인에 성공했습니다!");
-			System.out.println(String.format("%s님 환영합니다!", Globaldata));
 			
 		}
 		else {
@@ -135,15 +132,6 @@ public class PhoneBookLauncher {
 				
 				result = true;
 				
-//				로그인한 사람을 객체로 만들어서 GlobalData의 변수에 저장
-				
-				User tempUser = new tempUser();
-								
-				tempUser.setName(rs.setString(rs.findColumn("name")));
-				tempUser.setName(rs.setString(rs.findColumn("email")));
-				
-				Global
-				
 			}
 			
 			
@@ -162,6 +150,13 @@ public class PhoneBookLauncher {
 	}
 	
 }
+
+
+
+
+
+
+
 
 
 
