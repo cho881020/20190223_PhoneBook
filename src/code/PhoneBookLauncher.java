@@ -2,6 +2,7 @@ package code;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,6 +34,8 @@ public class PhoneBookLauncher {
 			
 			else if(userInput == 2) {
 //				회원가입
+				signUp();
+				
 			}
 			
 			else if(userInput == 0) {
@@ -170,6 +173,76 @@ public class PhoneBookLauncher {
 		
 		
 		return result;
+	}
+	
+	public void signUp() {
+//		회원가입 관련 코드가 작성될 부분.
+//		사용자에게 이메일, 비번, 이름을 입력받아서 DB에 INSERT!
+		
+		System.out.println("회원가입을 진행합니다.");
+		
+		Scanner scan1 = new Scanner(System.in);
+		System.out.print("아이디를 입력 : ");
+		String sighUpEmail = scan1.nextLine();
+		
+		Scanner scan2 = new Scanner(System.in);
+		System.out.print("비밀번호를 입력 : ");
+		String sighUpPassword = scan2.nextLine();
+		
+		Scanner scan3 = new Scanner(System.in);
+		System.out.print("이름를 입력 : ");
+		String sighUpName = scan3.nextLine();
+		
+		registerUserToDB(sighUpEmail, sighUpPassword, sighUpName);
+		
+	}
+	
+//	DB에 사용자를 등록!
+	public void registerUserToDB(String email, String pw, String name) {
+		
+		Connection conn = null;
+//		INSERT 등의 데이터 조작 쿼리를 실행시켜주는 변수
+		PreparedStatement pstmt = null;
+		
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			
+			conn = DriverManager.getConnection(url, "delivery", "dbpassword");
+		
+//			INSERT 쿼리를 먼저 작성!
+			String signUpSql = String.format("INSERT INTO users (email, password, name) "
+					+ "VALUES ('%s', '%s', '%s');", email, pw, name );
+			
+			
+//			DB연결이 되었으니, INSERT 쿼리를 날릴 준비.						
+			pstmt = conn.prepareStatement(signUpSql);
+			
+//			INSERT/UPDATE/DELET 문을 실행하면, 영향 받은 줄이 몇줄인지?
+			int affectedRowCount = pstmt.executeUpdate();
+			
+			if(affectedRowCount == 0) {
+				System.out.println("회원가입에 문제가 발생했습니다.");
+			}
+			else {
+				System.out.println("회원가입에 성공했습니다!");
+				System.out.println("메인메뉴로 돌아갑니다.");
+			}
+			
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 	}
 	
 }
