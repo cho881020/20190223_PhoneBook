@@ -50,7 +50,7 @@ public class PhoneBookLauncher {
 
 //	메인화면을 출력하는 메쏘드
 	public void printMainMenu() {
-		System.out.println("********** 전화번호부 **********");
+		System.out.println("********** 메인화면 **********");
 		System.out.println(" 1.로그인");
 		System.out.println(" 2. 회원가입");
 		System.out.println(" 0. 프로그램 종료");
@@ -77,8 +77,12 @@ public class PhoneBookLauncher {
 		
 		if (loginResult) {
 //			로그인 성공! 성공처리 메쏘드 별개로 작성
-			System.out.println("로그인에 성공했습니다!");
+			System.out.print("로그인에 성공했습니다!");
 			System.out.print(String.format("%s님 환영합니다!", GlobalData.loginUser.getName()));
+			
+			loginMenu();
+			
+			
 		}
 		else {
 			System.out.println("아이디나 비번이 잘못되었습니다.");
@@ -184,7 +188,7 @@ public class PhoneBookLauncher {
 		
 		
 		try {
-			Class.forName("com.mysql,jdbc.Driver");
+			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
 			conn = DriverManager.getConnection(url, "delivery","dbpassword");
 			
@@ -219,6 +223,205 @@ public class PhoneBookLauncher {
 		
 		
 		
+	}
+	
+	public void loginMenu() {
+		
+		Scanner scan = new Scanner(System.in);
+		while (true) {
+			printUserMenu();
+			int menuNum = scan.nextInt();
+			
+			if (menuNum == 1) {
+				
+			}
+			else if (menuNum == 2) {
+				
+			}
+			else if (menuNum == 3) {
+				
+			}
+			
+			else if (menuNum == 0) {
+//				로그아웃 => 로그인한 사람이 없다고 설정
+				GlobalData.loginUser = null;
+				
+				System.out.println("로그아웃했습니다.");
+				System.out.println("메인화면으로 돌아갑니다.");
+				break;
+				
+			}
+			else {
+				System.out.println("잘못된 입력입니다");
+			}
+		}
+		
+	}
+	
+	
+	public void printUserMenu() {
+		System.out.println("********** 전화번호부 **********");
+		System.out.println(" 1. 전체 전화번호 목록 조회");
+		System.out.println(" 2. 전화번호 등록");
+		System.out.println(" 3. 전화번호 삭제");
+		System.out.println(" 0. 로그아웃");
+		System.out.println("****************************");
+		System.out.print("메뉴를 선택하세요 : ");
+		
+	}
+	
+	public void showAllPhoneNumbers() {
+//		
+	}
+	
+//	전화번호 등록을 누르면 들어오는 메쏘드
+	public void addPhoneNumber() {
+		
+		System.out.println("새 전화번호를 등록합니다.");
+		Scanner scan = new Scanner(System.in);
+		System.out.print("이름 : ");
+		String inputName = scan.next();
+		
+		
+		System.out.print("폰번 : ");
+		String inputPhoneNum = scan.next();
+		
+		System.out.print("특이사항 : ");
+		String inputMemo = scan.next();
+//		여기까지 사용자에게 정보 입력받는 부분
+		
+//		입력을 다 받았으니 db에 기록
+		registerPhoneNumToDB(inputName, inputPhoneNum, inputMemo);
+	}
+	
+	public void registerPhoneNumToDB(String inputName, String inputPhoneNum, String inputMemo) {
+		Connection conn = null;
+//		연결된 디비에 쿼리를 실행시켜줌
+		Statement stmt = null;
+//		쿼리 실행 결과를 저장하는 변수 (표)
+		ResultSet rs = null;
+		
+
+		try {
+//			JDBC 불러오기
+			Class.forName("com.mysql.jdbc.Driver");
+//			불러온 JDBC 이용해 디비 접속
+//			접속 정보를 변수에 저장
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			
+//			저장된 접속정보로 디비 접속
+			conn = DriverManager.getConnection(url, "delivery","dbpassword");
+			
+//			System.out.println("DB연결 성공!");
+			
+//			재료로 받은 아이디,비번이 모두 맞는 사용자가 있는지 쿼리
+			String loginQuery = String.format("SELECT * FROM users WHERE email = '%s' AND password = '%s';", email,pw);
+			
+//			쿼리를 수행해서 결과를 저장
+//			1. stmt 변수를 객체화
+			stmt = conn.createStatement();
+//			2.stmt이용해서 로그인 쿼리 실행 + 결과를 rs에 저장
+			rs = stmt.executeQuery(loginQuery);
+//			3.rs에 저장된 표를 조회
+//			rs.next는, 다음 읽을 줄이 있다면 그 줄로 커서를 이동시키고 true 리턴
+//			읽을 내용이 더 없다면 false리턴
+			while(rs.next()) {
+//				이안에 들어왔다 = 아이디,비번이 맞는 사람이 있다
+//				=>로그인에 성공했다!
+				
+				result = true;
+				
+//				로그인한 사람을 객체로 만들어서 GlobalData의 변수에 저장
+				User tempUser = new User();
+//				쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장
+				tempUser.setName(rs.getString(rs.findColumn("name")));
+				tempUser.setEmail(rs.getString(rs.findColumn("email")));
+				
+				tempUser.setId(rs.getInt(rs.findColumn("id")));
+				
+//				로그인한 사람을 저장
+				GlobalData.loginUser = tempUser;
+				
+				
+			}
+			
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return result;
+	}
+	
+	public void signUp() {
+//		회원가입 관련 코드 작성될 부분
+//		사용자에게 이메일,비번,이름 입력받아서 db에 INSERT!
+		System.out.println("회원가입을 진행합니다.");
+		
+		Scanner scan1 = new Scanner(System.in);
+		System.out.print("아이디를 입력하세요 : ");
+		String signUpEmail = scan1.nextLine();
+		
+		Scanner scan2 = new Scanner(System.in);
+		System.out.print("비밀번호를 입력하세요 : ");
+		String signUpPassword = scan2.nextLine();
+		
+		Scanner scan3 = new Scanner(System.in);
+		System.out.print("이름을 입력하세요 : ");
+		String signUpName = scan3.nextLine();
+		
+		registerUserToDB(signUpEmail, signUpPassword, signUpName);
+		
+		
+	}
+//	db에 사용자 등록
+	public void registerUserToDB(String email,String pw,String name) {
+		
+		Connection conn = null;
+		
+//		insert 등의 데이터 조작 쿼리를 실행시켜주는 변수
+		PreparedStatement pstmt = null;
+		
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			conn = DriverManager.getConnection(url, "delivery","dbpassword");
+			
+//			insert쿼리 작성
+			String signUpSql = String.format("INSERT INTO phone_numbers (name,phone_num,memo,user_id) VALUES ('%s','%s','%s',%d);", inputName, inputPhone ,inputMemo, GlobalData.loginUser.getName());
+			
+			
+//			db연결이 되었으니 ,insert쿼리 날릴 준비
+			pstmt = conn.prepareStatement(signUpSql);
+			
+//			insert/update/delete문 실행하면, 영향받은줄이 몇줄인지? 
+			int affectedRowCount = pstmt.executeUpdate();
+			
+			if (affectedRowCount == 0) {
+				System.out.println("회원가입에 문제가 발생했습니다");
+				
+			}
+			else {
+				System.out.println("회원가입 성공!");
+				System.out.println("메인메뉴로 돌아갑니다");
+				
+			}
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
