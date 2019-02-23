@@ -236,7 +236,7 @@ public class PhoneBookLauncher {
 				
 			}
 			else if (menuNum == 2) {
-				
+				addPhoneNumber();
 			}
 			else if (menuNum == 3) {
 				
@@ -271,8 +271,73 @@ public class PhoneBookLauncher {
 	}
 	
 	public void showAllPhoneNumbers() {
-//		
+//		전화번호 전체 목록 조회 => 로그인한 사람이 입력한 전화번호만.
+//		동작 구조 : DB에서 먼저 목록을 조회
+//		조회 결과를 ArrayList에 저장
+//		저장된 ArrayList를 화면에 출력
 	}
+	
+//	db에 저장된 내가 저장한 폰번들을 가져옴
+	public void getPhoneNumsFromDB() {
+//		DB와의 연결 상태를 저장하는 변수
+		Connection conn = null;
+//		연결된 디비에 쿼리를 실행시켜줌
+		Statement stmt = null;
+//		쿼리 실행 결과를 저장하는 변수 (표)
+		ResultSet rs = null;
+		
+
+		try {
+//			JDBC 불러오기
+			Class.forName("com.mysql.jdbc.Driver");
+//			불러온 JDBC 이용해 디비 접속
+//			접속 정보를 변수에 저장
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			
+//			저장된 접속정보로 디비 접속
+			conn = DriverManager.getConnection(url, "delivery","dbpassword");
+			
+//			System.out.println("DB연결 성공!");
+			
+//			로그인한 사람이 등록한 폰번들을 조회하는 쿼리  Ex. 7번 사용자가 등록한 모든 폰번?
+			String phoneNumsQuery = String.format("SELECT * FROM phone_numbers WHERE user_id=%d;", GlobalData.loginUser.getId());
+			
+//			쿼리를 수행해서 결과를 저장
+//			1. stmt 변수를 객체화
+			stmt = conn.createStatement();
+//			2.stmt이용해서 로그인 쿼리 실행 + 결과를 rs에 저장
+			rs = stmt.executeQuery(phoneNumsQuery);
+//			3.rs에 저장된 표를 조회
+//			rs.next는, 다음 읽을 줄이 있다면 그 줄로 커서를 이동시키고 true 리턴
+//			읽을 내용이 더 없다면 false리턴
+			while(rs.next()) {
+//				이안에 들어왔다 = 내가 폰번을 저장한게 있다
+//				=>전부 찾아서 저장!
+				
+				
+				
+//				하나하나를 [전화번호 목록]으로 변환해서 저장
+				User tempUser = new User();
+//				쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장
+				tempUser.setName(rs.getString(rs.findColumn("name")));
+				tempUser.setEmail(rs.getString(rs.findColumn("email")));
+//				로그인한 사람을 저장
+				GlobalData.loginUser = tempUser;
+				
+				
+			}
+			
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	
 //	전화번호 등록을 누르면 들어오는 메쏘드
 	public void addPhoneNumber() {
@@ -381,48 +446,40 @@ public class PhoneBookLauncher {
 		
 	}
 //	db에 사용자 등록
-	public void registerUserToDB(String email,String pw,String name) {
-		
-		Connection conn = null;
-		
-//		insert 등의 데이터 조작 쿼리를 실행시켜주는 변수
-		PreparedStatement pstmt = null;
-		
-		
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
-			conn = DriverManager.getConnection(url, "delivery","dbpassword");
-			
-//			insert쿼리 작성
-			String signUpSql = String.format("INSERT INTO phone_numbers (name,phone_num,memo,user_id) VALUES ('%s','%s','%s',%d);", inputName, inputPhone ,inputMemo, GlobalData.loginUser.getName());
-			
-			
-//			db연결이 되었으니 ,insert쿼리 날릴 준비
-			pstmt = conn.prepareStatement(signUpSql);
-			
-//			insert/update/delete문 실행하면, 영향받은줄이 몇줄인지? 
-			int affectedRowCount = pstmt.executeUpdate();
-			
-			if (affectedRowCount == 0) {
-				System.out.println("회원가입에 문제가 발생했습니다");
-				
-			}
-			else {
-				System.out.println("회원가입 성공!");
-				System.out.println("메인메뉴로 돌아갑니다");
-				
-			}
-			
-			
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
+	/*
+	 * public void registerPhoneNumToDB(String email,String pw,String name) {
+	 * 
+	 * Connection conn = null;
+	 * 
+	 * // insert 등의 데이터 조작 쿼리를 실행시켜주는 변수 PreparedStatement pstmt = null;
+	 * 
+	 * 
+	 * try { Class.forName("com.mysql.jdbc.Driver"); String url =
+	 * "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+	 * conn = DriverManager.getConnection(url, "delivery","dbpassword");
+	 * 
+	 * // insert쿼리 작성 String signUpSql = String.
+	 * format("INSERT INTO phone_numbers (name,phone_num,memo,user_id) VALUES ('%s','%s','%s',%d);"
+	 * , inputName, inputPhone ,inputMemo, GlobalData.loginUser.getName());
+	 * 
+	 * 
+	 * // db연결이 되었으니 ,insert쿼리 날릴 준비 pstmt = conn.prepareStatement(signUpSql);
+	 * 
+	 * // insert/update/delete문 실행하면, 영향받은줄이 몇줄인지? int affectedRowCount =
+	 * pstmt.executeUpdate();
+	 * 
+	 * if (affectedRowCount == 0) { System.out.println("회원가입에 문제가 발생했습니다");
+	 * 
+	 * } else { System.out.println("회원가입 성공!"); System.out.println("메인메뉴로 돌아갑니다");
+	 * 
+	 * }
+	 * 
+	 * 
+	 * } catch (ClassNotFoundException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } catch (SQLException e) { // TODO Auto-generated catch
+	 * block e.printStackTrace(); } }
+	 */
 	
 	
 }
