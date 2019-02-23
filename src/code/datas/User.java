@@ -5,6 +5,7 @@ public class User {
 //	로그인한 사용자의 이름, 이메일을 저장
 	private String email;
 	private String name;
+	private int id;
 	
 	
 	
@@ -28,6 +29,13 @@ public class User {
 	}
 	public void setName(String name) {
 		this.name = name;
+		
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	
