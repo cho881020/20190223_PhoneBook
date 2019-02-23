@@ -134,7 +134,12 @@ public class PhoneBookLauncher {
 				
 			}
 			
+			int affectesRowCount = pstmt.executeUpdate();
 			
+			if(affectedRowCount == 0 ) {
+				System.out.println("회원가입에 문제가 발생했습니다.");
+				
+			}
 			
 			
 		} catch (ClassNotFoundException e) {
@@ -151,7 +156,7 @@ public class PhoneBookLauncher {
 	
 }
 
-
+		
 
 
 
