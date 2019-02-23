@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-import code.datas.User;
+import code.data.User;
 import code.utils.GlobalData;
 
 public class PhoneBookLauncher {
@@ -242,7 +242,73 @@ public class PhoneBookLauncher {
 
 
 
-
+public void getPhoneNumsFromDB() {
+	
+	
+//	DB와의 연결 상태를 저장해두는 변수
+	Connection conn = null;
+//	연결된 DB에 쿼리를 실행시켜줌.
+	Statement stmt = null;
+//	쿼리 실행 결과를 저장하는 변수. (표)
+	ResultSet rs = null;
+	
+	try {
+//		JDBC를 불러오기.
+		Class.forName("com.mysql.jdbc.Driver");
+		
+//		불러온 JDBC를 이용해서 DB에 접속
+//		접속 정보를 변수에 저장.
+		String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+		
+//		저장된 접속정보와 아이디 비번을 가지고 실제로 DB에 접속.
+		conn = DriverManager.getConnection(url, "delivery", "dbpassword");
+		
+		
+//		로그인한 사람이 등록한 폰번들을 조회
+//		예) 3번 사용자
+		String loginQuery = String.format("SELECT * FROM phone_numbers "
+				+ "WHERE user_id = %d;", GlobalData.loginUser.getId());
+		
+//		쿼리를 수행해서 결과를 저장
+//		1. stmt 변수를 객체화
+		stmt = conn.createStatement();
+		
+//		2. stmt를 이용해서 loginQuery를 실행 + 결과를 rs에 저장
+		rs = stmt.executeQuery(loginQuery);
+		
+//		3. rs에 저장된 표를 조회
+//		rs.next는, 다음 읽을 줄이 있다면 그 줄로 커서를 이동. true
+//		읽을내용이 더 없다면 그냥 false를 리턴.
+		while (rs.next()) {
+//			이 안에 들어왔따 => 아이디비번이 맞는 사람이 있다!
+//			 => 로그인에 성공!
+			
+			
+//			로그인한 사람을 객체로 만들어서 GlobalData의 변수에 저장.
+			
+			PhoneNumber tempPN = new PhoneNumber();
+			
+//			쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장.
+			tempPN.setName(rs.getString(rs.findColumn("name")));
+			tempPN.setEmail(rs.getString(rs.findColumn("email")));
+			tempPN.setId(rs.getString(rs.findColumn("id")));
+//			로그인 한 사람을 저장!
+			GlobalData.loginUser = tempPN;
+			
+			
+		}
+		
+		
+		
+		
+	} catch (ClassNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
 
 
 
