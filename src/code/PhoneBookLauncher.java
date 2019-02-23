@@ -2,6 +2,7 @@ package code;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
@@ -68,8 +69,11 @@ public class PhoneBookLauncher {
 		boolean loginResult = findUserDatabase(userInputEmail, userInputEmail);
 		if(loginResult) {
 //			로그인 성공! 성공 처리 메쏘드 별개 처리
+			
+			System.out.println("로그인에 성공했습니다.");
 		}
 		else{
+			System.out.println("로그인에 실패했습니다.");
 			System.out.println("메인화면으로 이동합니다.");
 		}
 		
@@ -86,7 +90,7 @@ public class PhoneBookLauncher {
 //		연결된 DB에 쿼리를 실행 시켜줌.
 		Statement stmt = null;
 //		쿼리 실행 결과를 저장하는 변수 (표).
-		Resultset rs = null;
+		ResultSet rs = null;
 		
 //		드라이버 로드
 		try {
@@ -100,7 +104,22 @@ public class PhoneBookLauncher {
 //			저장된 접속 정보와 아이디 비번을 가지고 실제로 db에 접속.
 			conn = DriverManager.getConnection(url, "delivery", "dbpassword");
 			
-			System.out.println("DB 연결 성공!");
+//			재료로 받은 아이디,비번이 모두 맞는 사용자가 있는지 쿼리.
+			String loginQuery = String.format("SELECT * FROM users "
+						+ "WHERE email= '%s' AND password = '%s';", email, pw);
+			
+//			쿼리수행해서 결과를 저장
+//			1. stmt변수를 객체화 함.
+			stmt = conn.createStatement();
+			
+//			2. stmt를 이용해서 loginQuery를 실행 + 결과를 rs에 저장
+			rs = stmt.executeQuery(loginQuery);
+			
+			while(rs.next()) {
+//				이안에 들어온것은 아이디 비번이 맞는사람.
+				
+				result = true;
+			}
 			
 		} catch (ClassNotFoundException e) {
 			
