@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import code.data.PhoneNumber;
-import code.datas.User;
-//import code.data.User;
+import code.data.User;
 import code.utils.GlobalData;
 
 public class PhoneBookLauncher {
@@ -65,7 +64,6 @@ public class PhoneBookLauncher {
 	public void login() {
 
 		Scanner scan1 = new Scanner(System.in);
-
 		System.out.print("ID(Email) : ");
 		String userInputEmail = scan1.nextLine();
 

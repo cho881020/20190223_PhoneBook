@@ -1,10 +1,9 @@
 package code.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import code.data.PhoneNumber;
-import code.datas.User;
+import code.data.User;
 
 //	이 클래스에 만드는 변수는 모든 클래스에서 쉽게 접근하기 위한 목적
 
