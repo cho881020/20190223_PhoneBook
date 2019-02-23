@@ -3,7 +3,7 @@ package code.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import code.datas.PhoneNumber;
+import code.datas.PhoneNum;
 import code.datas.User;
 
 // 이 클래스에 만드는 변수는 모든 클래스에서 쉽게 접근하기 위한 목적
@@ -13,7 +13,7 @@ public class GlobalData {
 	public static User loginUser = null;
 	
 //	로그인한 사람이 저장한 폰번들이 담겨있는 ArrayList
-	public static ArrayList<PhoneNumber> loginUserPhoneNumbers = null;
+	public static ArrayList<PhoneNum> loginUserPhoneNumbers = null;
 	
 	
 }
