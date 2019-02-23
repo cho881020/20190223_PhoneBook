@@ -6,8 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import code.datas.PhoneNumber;
 import code.datas.User;
 import code.utils.GlobalData;
 
@@ -275,10 +278,21 @@ public class PhoneBookLauncher {
 //		동작 구조 : DB에서 먼저 목록을 조회
 //		조회 결과를 ArrayList에 저장
 //		저장된 ArrayList를 화면에 출력
+		GlobalData.loginUserPhoneNumbers = getPhoneNumsFromDB();
+//		저장된 ArrayList를 화면에 출력
+		for (int i = 0; i < GlobalData.loginUserPhoneNumbers.size; i++) {
+			PhoneNumber pn = GlobalData.loginUserPhoneNumbers.get(i);
+			
+						System.out.println(String.format("%s/%s/%s", pn.getName(),pn.getPhoneNumber(),pn.getMemo());
+		}
 	}
 	
 //	db에 저장된 내가 저장한 폰번들을 가져옴
-	public void getPhoneNumsFromDB() {
+	public List<PhoneNumber> getPhoneNumsFromDB() {
+		
+//		찾아낸 폰번들을 임시로 저장할 ArrayList
+		List<PhoneNumber> tempPhoneNumbers = new ArrayList<PhoneNumber>();
+		
 //		DB와의 연결 상태를 저장하는 변수
 		Connection conn = null;
 //		연결된 디비에 쿼리를 실행시켜줌
@@ -310,6 +324,10 @@ public class PhoneBookLauncher {
 //			3.rs에 저장된 표를 조회
 //			rs.next는, 다음 읽을 줄이 있다면 그 줄로 커서를 이동시키고 true 리턴
 //			읽을 내용이 더 없다면 false리턴
+			
+			
+			
+			
 			while(rs.next()) {
 //				이안에 들어왔다 = 내가 폰번을 저장한게 있다
 //				=>전부 찾아서 저장!
@@ -317,12 +335,17 @@ public class PhoneBookLauncher {
 				
 				
 //				하나하나를 [전화번호 목록]으로 변환해서 저장
-				User tempUser = new User();
-//				쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장
-				tempUser.setName(rs.getString(rs.findColumn("name")));
-				tempUser.setEmail(rs.getString(rs.findColumn("email")));
-//				로그인한 사람을 저장
-				GlobalData.loginUser = tempUser;
+				PhoneNumber tempPN = new PhoneNumber();
+				
+
+				tempPN.setId(rs.getInt(rs.findColumn("id")));
+				tempPN.setName(rs.getString(rs.findColumn("id")));
+				tempPN.setPhoneNumber(rs.getString(rs.findColumn("phone_num")));
+				tempPN.setMemo(rs.getString(rs.findColumn("memo")));
+				
+//				찾아낸 폰번을 저장. => 만들어진 ArrayList<PhoneNumber>에 추가
+				
+				tempPhoneNumbers.add(tempPN);
 				
 				
 			}
@@ -336,6 +359,7 @@ public class PhoneBookLauncher {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return tempPhoneNumbers;
 	}
 	
 	
