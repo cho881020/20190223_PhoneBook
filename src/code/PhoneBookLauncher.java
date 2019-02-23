@@ -258,7 +258,7 @@ public class PhoneBookLauncher {
 				addPhoneNumber();
 			}
 			else if (menuNum == 3) {
-				
+				deletePhoneNum();
 			}
 			else if (menuNum == 0) {
 //				로그아웃 => 로그인 한 사람이 없다고 설정
@@ -363,6 +363,57 @@ public class PhoneBookLauncher {
 		}
 		
 		
+	}
+	
+	public void deletePhoneNum() {
+//		사용자에게 삭제하고자 하는 사람의 이름을 입력받자
+		System.out.println("전화번호 삭제");
+		Scanner scan = new Scanner(System.in);
+		System.out.print("지울 사람 이름 입력 : ");
+		String deletePhoneNumName = scan.nextLine();
+//		(로그인한 사용자가 등록한 폰번 중) 그 이름과 같은 폰번을 삭제하자
+		deletePhoneNumFromDB(deletePhoneNumName);
+//		삭제하면 사용자메뉴로 복귀
+		System.out.println("삭제 메뉴를 종료합니다");
+	}
+	
+	public void deletePhoneNumFromDB(String name) {
+		Connection conn = null;
+//		INSERT 등의 데이터 조작 쿼리를 실행시켜주는 변수
+		PreparedStatement pstmt = null;
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			conn = DriverManager.getConnection(url, "delivery", "dbpassword");
+			
+//			폰번 지우는DELETE 쿼리를 작성!
+			String deleteSql = String.format("DELETE FROM phone_numbers WHERE name ='%s'AND user_id=%d;",name,GlobalData.loginUser.getId());
+			
+//			DB연결이 되었으니, INSERT 쿼리를 날릴 준비.
+			pstmt = conn.prepareStatement(deleteSql);
+			
+//			INSERT/UPDATE/DELETE 문을 실행하면, 영향 받은 줄이 몇줄인지?
+			int affectedRowCount =  pstmt.executeUpdate();
+			
+			if (affectedRowCount == 0) {
+				System.out.println("전화번호를 삭제하지 못 했습니다.");
+				System.out.println("입력한 이름을 확인해주세요");
+			}
+			else {
+				System.out.println(String.format("%d개의 전화번호가 삭제되었습니다.", affectedRowCount));
+				System.out.println("사용자 메뉴로 돌아갑니다.");
+			}
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
