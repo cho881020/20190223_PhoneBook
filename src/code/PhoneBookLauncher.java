@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import code.datas.User;
+import code.utils.GlobalData;
+
 public class PhoneBookLauncher {
 	
 	public void startPhoneBook() {
@@ -71,6 +74,7 @@ public class PhoneBookLauncher {
 		if (loginResult) {
 //			로그인 성공! 성공 처리 메쏘드 별개로 작성.
 			System.out.println("로그인에 성공했습니다!");
+			System.out.println(String.format("%s님 환영합니다!", GlobalData.LoginUser.getName()));
 		}
 		else {
 			System.out.println("아이디나 비번이 잘못되었습니다.");
@@ -123,6 +127,15 @@ public class PhoneBookLauncher {
 //				 => 로그인에 성공!
 				result = true;
 				
+//				로그인한 사람을 객체로 만들어서 GlobalData의 변수에 저장.
+				User tempUser = new User();
+				
+//				쿼리 결과에서 두번째 컬럼이 이름이니, 이를 스트링으로 뽑아서 저장.
+				tempUser.setName(rs.getString(rs.findColumn("name")));
+				tempUser.setEmail(rs.getString(rs.findColumn("email")));
+				
+//				로그인한 사람을 저장! (더이상 null이 아니게 되겠지)
+				GlobalData.LoginUser = tempUser;
 			}
 			
 		} catch (ClassNotFoundException e) {
