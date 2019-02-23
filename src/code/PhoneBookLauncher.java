@@ -255,7 +255,7 @@ public class PhoneBookLauncher {
 			int menuNum = scan.nextInt();
 			
 			if ( menuNum == 1) {
-				
+				showAllPhoneNumbers();
 			}
 			else if (menuNum == 2) {
 				addPhoneNumber();
@@ -298,7 +298,21 @@ public class PhoneBookLauncher {
 	public void showAllPhoneNumbers() {
 //		동작 구조 : DB에서 먼저 목록을 조회.
 //		조회 결과를 ArrayList에 저장.
+		
+		GlobalData.loginUserPhoneNums = getPhoneNumsFromDB();
+		
 //		저장된 ArrayList를 화면에 출력
+		
+		for (int i=0 ; i < GlobalData.loginUserPhoneNums.size() ; i++) {
+			
+			PhoneNumber pn = GlobalData.loginUserPhoneNums.get(i);
+			
+			
+			System.out.println(String.format("%s/%s/%s", pn.getName(), pn.getPhoneNumber(), pn.getMemo()));
+			
+		}
+		
+		
 	}
 	
 	
