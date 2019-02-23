@@ -367,7 +367,6 @@ public class PhoneBookLauncher {
 	}
 	
 	public void deletePhoneNum() {
-		
 //		사용자에게 삭제하고 하는 사람의 이름을 입력받자.
 		
 		System.out.println("전화번호 삭제!");
