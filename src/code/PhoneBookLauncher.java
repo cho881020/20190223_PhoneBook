@@ -230,7 +230,7 @@ public class PhoneBookLauncher {
 			int menuNum = scan.nextInt();
 
 			if (menuNum == 1) {
-
+				showAllPhoneNumbers();
 			} else if (menuNum == 2) {
 				addPhoneNumbers();
 			} else if (menuNum == 3) {
@@ -252,6 +252,8 @@ public class PhoneBookLauncher {
 
 	}
 
+	
+	
 	public void printUserMenu() {
 		System.out.println("********** 전화번호부 **********");
 		System.out.println(" 1. 전체 전화번호 목록 조회");
@@ -263,14 +265,33 @@ public class PhoneBookLauncher {
 
 	}
 
+	
+	
 //	전화번호 전체 목록 조회 => 로그인 한 사람이 입력한 전화번호만.
 	public void showAllPhoneNumbers() {
 //		동작 구조 : DB에서 먼저 목록을 조회
 //		조회 결과를 ArrayList에 저장
+
+		GlobalData.loginUserPhoneNums = getPhoneNumbsFromDB();
+		
+		
 //		저장된 ArrayList를 화면에 출력
+		
+		
+		
+		for(int i=0; i< GlobalData.loginUserPhoneNums.size(); i++) {
+		
+			PhoneNumber pn = GlobalData.loginUserPhoneNums.get(i);
+			
+			System.out.println(String.format("%s/%s/%s", pn.getName(),pn.getPhoneNum(),pn.getMemo()));
+		}
+		
+		
 
 	}
 
+	
+	
 //	DB에 저장된 내가 저장한 폰번들을 가져옴
 	public List<PhoneNumber> getPhoneNumbsFromDB() {
 
