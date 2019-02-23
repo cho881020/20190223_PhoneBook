@@ -6,8 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import code.datas.PhoneNumber;
 import code.datas.User;
 import code.utils.GlobalData;
 
@@ -288,11 +291,97 @@ public class PhoneBookLauncher {
 		
 	}
 	
-	public void showAllPhoneNumbers() {
-		
-//		
+//	전화번호 전체 목록 조회 => 로그인 한 사람이 입력한 전화번호만.
+	public void showAllPhoneNumbers() {		
+//		동작 구조 : DB에서 먼저 목록을 조회.
+//		조회 결과를 ArrayList에 저장.
+//		저장된 ArrayList를 화면에 출력.
 		
 	}
+	
+//	DB에서 내가 저장한 폰번들을 가져옴. 
+	public List<PhoneNumber> getPhoneNumsFromDB() {
+		
+//		찾아낸 폰번들을 임시로 저장할 ArrayList
+		List<PhoneNumber> tempPhoneNumber = new ArrayList<PhoneNumber>();
+		
+
+//		DB와의 연결 상태를 저장해두는 변수
+		Connection conn = null;		
+//		연결된 DB에 쿼리를 실행시켜줌.
+		Statement stmt = null;		
+//		쿼리 실행 결과를 저장하는 변수. (표)
+		ResultSet rs = null;
+		
+		try {
+//			JDBC를 불러오기.
+			Class.forName("com.mysql.jdbc.Driver");
+			
+//			불러온 JDBC를 이용해서 DB에 접속
+//			접속 정보를 변수에 저장.
+			String url = "jdbc:mysql://delivery.c0ctoatt9tr3.ap-northeast-2.rds.amazonaws.com/tjeit";
+			
+//			저장된 접속 정보와 아이디 비번을 가지고 실제로 DB에 접속.			
+			conn = DriverManager.getConnection(url,"delivery","dbpassword");
+			
+//			로그인한 사람이 등록한 폰번들을 조회
+//			Ex. 3번 사용자가 등록한 모든 폰번?
+			String phoneNumsQuery = String.format("SELECT * FROM phone_numbers "
+					+ "WHERE user_id = '%d';", GlobalData.loginUser.getId());
+			
+//			쿼리를 수행해서 결과를 저장
+//			1. stmt 변수를 객체화
+			stmt = conn.createStatement();
+			
+//			2. stmt를 이용해서 loginQuery를 실행 + 결과를 rs에 저장
+			rs = stmt.executeQuery(phoneNumsQuery);
+			
+			
+
+			
+			
+//			3. rs에 저장된 표를 조회
+//			rs.next는 다음 읽을 줄이 있다면 그 줄로 커서를 이동. true
+//			읽을 내용이 더 없다면 그냥 false를 리턴.
+			
+			while(rs.next()) {
+//				이안에 들어왔다 => 내가 폰번을 저장한게 있다!
+//				 => 전부 찾아서 저장.
+				
+//				하나하나를 [전화번호목록]으로 변환해서 저장.
+				
+				PhoneNumber tempPN = new PhoneNumber();
+				
+//				tempPN에게 고유번호 / 이름 / 폰번 / 메모를 담아준다.
+				
+				tempPN.setId(rs.getInt(rs.findColumn("id")));
+				tempPN.setName(rs.getString(rs.findColumn("name")));
+				tempPN.setPhoneNumber(rs.getString(rs.findColumn("phone_num")));
+				tempPN.setMemo(rs.getString(rs.findColumn("memo")));
+				
+				
+//				찾아낸 폰번을 저장. =>만들어진 ArrayList<PhoneNumber>에 추가
+				
+				tempPhoneNumber.add(tempPN);
+				
+			}				
+								
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("DB 드라이버 로딩 실패");
+			System.out.println("JDBC를 제대로 추가했는지 확인해주세요.");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("DB 서버 연결 실패");
+			System.out.println("DB 서버가 접속이 가능한 상태인지 확인.");
+			System.out.println("접속 정보를 틀리지 않고 입력했는지 코드 검토.");
+		}
+		
+		return tempPhoneNumber;
+	}
+	
 	
 //	전화번호 등록을 누르면 들어오는 메쏘드
 	public void addPhoneNumber() {
